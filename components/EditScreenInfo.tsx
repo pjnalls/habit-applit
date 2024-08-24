@@ -6,10 +6,12 @@ import { MonoText } from './StyledText';
 import { Text, View } from './Themed';
 
 import Colors from '@/constants/Colors';
+import { useColorScheme } from 'nativewind';
 
 export default function EditScreenInfo({ path }: { path: string }) {
+  const { colorScheme } = useColorScheme();
   return (
-    <View>
+    <View style={{ backgroundColor: Colors[colorScheme ?? 'light'].card }}>
       <View style={styles.getStartedContainer}>
         <Text
           style={styles.getStartedText}
@@ -54,6 +56,7 @@ const styles = StyleSheet.create({
   getStartedContainer: {
     alignItems: 'center',
     marginHorizontal: 50,
+    backgroundColor: 'transparent',
   },
   homeScreenFilename: {
     marginVertical: 7,
@@ -71,6 +74,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginHorizontal: 20,
     alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   helpLink: {
     paddingVertical: 15,

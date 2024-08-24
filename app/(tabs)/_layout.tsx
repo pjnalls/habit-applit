@@ -11,10 +11,11 @@ import { useColorScheme } from 'nativewind';
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
+  size?: number;
 }) {
   return (
     <FontAwesome
-      size={28}
+      size={props.size ?? 24}
       style={{ marginBottom: -3 }}
       {...props}
     />
@@ -33,12 +34,12 @@ export default function TabLayout() {
         headerShown: useClientOnlyValue(false, true),
       }}>
       <Tabs.Screen
-        name='index'
+        name='tracker'
         options={{
-          title: 'Tab One',
+          title: 'Tracker',
           tabBarIcon: ({ color }) => (
             <TabBarIcon
-              name='code'
+              name='list'
               color={color}
             />
           ),
@@ -57,14 +58,53 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name='two'
+        name='index'
+        initialParams={{ showAddHabitModal: true }}
         options={{
-          title: 'Tab Two',
+          title: '',
+          headerTitle: 'Create',
           tabBarIcon: ({ color }) => (
             <TabBarIcon
-              name='code'
+              size={40}
+              name='plus-circle'
               color={color}
             />
+          ),
+          headerRight: () => (
+            <Pressable onPress={toggleColorScheme}>
+              {({ pressed }) => (
+                <FontAwesome
+                  name={colorScheme === 'dark' ? 'sun-o' : 'moon-o'}
+                  size={25}
+                  color={Colors[colorScheme ?? 'light'].text}
+                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                />
+              )}
+            </Pressable>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name='progress'
+        options={{
+          title: 'Progress',
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon
+              name='bar-chart'
+              color={color}
+            />
+          ),
+          headerRight: () => (
+            <Pressable onPress={toggleColorScheme}>
+              {({ pressed }) => (
+                <FontAwesome
+                  name={colorScheme === 'dark' ? 'sun-o' : 'moon-o'}
+                  size={25}
+                  color={Colors[colorScheme ?? 'light'].text}
+                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                />
+              )}
+            </Pressable>
           ),
         }}
       />

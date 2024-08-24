@@ -1,12 +1,19 @@
+import { useColorScheme } from 'nativewind';
 import { StyleSheet } from 'react-native';
 
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
+import Colors from '@/constants/Colors';
 
 export default function TabTwoScreen() {
+  const { colorScheme } = useColorScheme();
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: Colors[colorScheme ?? 'light'].card },
+      ]}>
+      <Text style={styles.title}>Progress</Text>
       <View
         style={styles.separator}
         lightColor='#eee'
