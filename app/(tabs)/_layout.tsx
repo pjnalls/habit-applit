@@ -34,9 +34,9 @@ export default function TabLayout() {
         headerShown: useClientOnlyValue(false, true),
       }}>
       <Tabs.Screen
-        name='tracker'
+        name='track'
         options={{
-          title: 'Tracker',
+          title: 'Track',
           tabBarIcon: ({ color }) => (
             <TabBarIcon
               name='list'

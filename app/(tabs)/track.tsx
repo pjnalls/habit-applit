@@ -14,7 +14,7 @@ export default function TabOneScreen() {
         styles.container,
         { backgroundColor: Colors[colorScheme ?? 'light'].card },
       ]}>
-      <Text style={styles.title}>Tracker</Text>
+      <Text style={styles.title}>Track Habit</Text>
       <View
         style={styles.separator}
         lightColor='#eee'

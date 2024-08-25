@@ -13,7 +13,7 @@ export default function TabTwoScreen() {
         styles.container,
         { backgroundColor: Colors[colorScheme ?? 'light'].card },
       ]}>
-      <Text style={styles.title}>Progress</Text>
+      <Text style={styles.title}>Visualize Progress</Text>
       <View
         style={styles.separator}
         lightColor='#eee'
