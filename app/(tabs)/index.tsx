@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useColorScheme } from 'nativewind';
@@ -7,6 +7,7 @@ import { Text, View } from '@/components/Themed';
 import Colors, { STORAGE_KEY } from '@/constants/Colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppDataJson } from '../types';
+import { AppDataContext } from '../_layout';
 
 export default function TabOneScreen() {
   const { colorScheme } = useColorScheme();
@@ -14,9 +15,11 @@ export default function TabOneScreen() {
   const [habitDesc, setHabitDesc] = useState('');
   const [nameError, setNameError] = useState<string | null>(null);
   const [descError, setDescError] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const { setAppData } = useContext(AppDataContext);
 
   const validateText = (name: string) => {
-    const alphaNumericRegex = /^[A-Za-z0-9]+$/;
+    const alphaNumericRegex = /^[A-Za-z0-9 ]+$/;
     return alphaNumericRegex.test(name);
   };
   const handleOnChangeText = (
@@ -34,20 +37,36 @@ export default function TabOneScreen() {
   const handleOnPress = async () => {
     try {
       const appData = await AsyncStorage.getItem(STORAGE_KEY);
-      let json: AppDataJson | null = null;
+      let json: AppDataJson;
 
       if (appData === null) {
-        json = {} as AppDataJson;
+        json = { habits: [], tracks: [] };
       } else {
         json = JSON.parse(appData);
       }
-      json?.habits.push({
+
+      const habit = {
         id: json.habits.length,
         name: habitName,
         description: habitDesc,
         frequency: 0,
+      };
+      json?.habits.push(habit);
+      json?.tracks.push({
+        id: json.tracks.length,
+        date: new Date().toLocaleString(),
+        habit: { id: habit.id, name: habit.name, completed: false },
       });
+
+      setAppData(json);
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(json));
+
+      setHabitName('');
+      setHabitDesc('');
+      setIsSuccess(true);
+      setTimeout(() => {
+        setIsSuccess(false);
+      }, 5000);
     } catch (error) {
       console.error('Error saving data.');
     }
@@ -66,6 +85,20 @@ export default function TabOneScreen() {
         darkColor='rgba(255,255,255,0.1)'
       />
       <View style={styles.inputContainer}>
+        {isSuccess ? (
+          <View style={styles.successContainer}>
+            <MaterialIcons
+              size={24}
+              name='check'
+              color={Colors[colorScheme ?? 'light'].success}
+            />
+            <Text style={{ color: Colors[colorScheme ?? 'light'].success }}>
+              Habit created successfully
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.successContainer}></View>
+        )}
         <View style={styles.innerInputContainer}>
           <Text>Name</Text>
           <TextInput
@@ -77,12 +110,11 @@ export default function TabOneScreen() {
               },
             ]}
             placeholder='Enter habit name here'
-            placeholderTextColor={
-              Colors[colorScheme ?? 'light'].placeholderColor
-            }
+            placeholderTextColor={Colors[colorScheme ?? 'light'].placeholder}
             onChangeText={text => {
               handleOnChangeText(text, setHabitName, setNameError);
             }}
+            maxLength={64}
           />
           {nameError ? (
             <Text style={styles.textInputError}>{nameError}</Text>
@@ -101,12 +133,11 @@ export default function TabOneScreen() {
               },
             ]}
             placeholder='Enter habit description here'
-            placeholderTextColor={
-              Colors[colorScheme ?? 'light'].placeholderColor
-            }
+            placeholderTextColor={Colors[colorScheme ?? 'light'].placeholder}
             onChangeText={text => {
               handleOnChangeText(text, setHabitDesc, setDescError);
             }}
+            maxLength={480}
           />
           {descError ? (
             <Text style={styles.textInputError}>{descError}</Text>
@@ -123,7 +154,7 @@ export default function TabOneScreen() {
             name='add-circle'
             color={
               !habitName || !habitDesc
-                ? Colors[colorScheme ?? 'light'].placeholderColor
+                ? Colors[colorScheme ?? 'light'].placeholder
                 : Colors[colorScheme ?? 'light'].text
             }
           />
@@ -131,7 +162,7 @@ export default function TabOneScreen() {
             style={{
               color:
                 !habitName || !habitDesc
-                  ? Colors[colorScheme ?? 'light'].placeholderColor
+                  ? Colors[colorScheme ?? 'light'].placeholder
                   : Colors[colorScheme ?? 'light'].text,
             }}>
             Create Habit
@@ -179,6 +210,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     alignItems: 'center',
+  },
+  successContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    backgroundColor: 'transparent',
+    gap: 4,
+    height: 12,
   },
   title: {
     fontSize: 20,

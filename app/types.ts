@@ -1,6 +1,6 @@
 export type AppDataJson = {
   habits: Habit[];
-  track: Track[];
+  tracks: Track[];
 };
 
 type Habit = {
@@ -16,10 +16,11 @@ type HabitId = number;
 type HabitTrack = {
   id: HabitId;
   completed: boolean;
+  name: string;
 };
 
-type Track = {
+export type Track = {
   id: number;
-  date: Date;
+  date: string;
   habit: HabitTrack;
 };
