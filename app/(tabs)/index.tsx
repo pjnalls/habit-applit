@@ -24,8 +24,8 @@ export default function TabOneScreen() {
   const { setAppData } = useContext(AppDataContext);
 
   const validateText = (name: string) => {
-    const alphaNumericRegex = /^[A-Za-z0-9 ]+$/;
-    return alphaNumericRegex.test(name);
+    const regex = /^[a-zA-Z0-9\s.,!?-]+$/;
+    return regex.test(name);
   };
   const nameRef = useRef<TextInput>(null);
   const descRef = useRef<TextInput>(null);

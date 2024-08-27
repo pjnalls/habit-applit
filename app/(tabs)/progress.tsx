@@ -26,7 +26,7 @@ export default function TabTwoScreen() {
         label: track.habit.name,
       }));
     }
-  }, [appData]);
+  }, [appData?.tracks]);
 
   return (
     <View
@@ -50,7 +50,7 @@ export default function TabTwoScreen() {
         }}>
         <ScrollView>
           <BarChart
-            barWidth={16}
+            barWidth={12}
             noOfSections={3}
             barBorderRadius={4}
             frontColor={Colors[colorScheme ?? 'light'].tint}
@@ -58,12 +58,13 @@ export default function TabTwoScreen() {
             color={Colors[colorScheme ?? 'light'].tint}
             width={360}
             height={96 * (barData.length + 1)}
-            xAxisLabelsHeight={120}
-            spacing={180}
+            xAxisLabelsHeight={64}
+            spacing={96}
             adjustToWidth={true}
             yAxisThickness={0}
             xAxisThickness={0}
             horizontal={true}
+            yAxisAtTop={true}
           />
         </ScrollView>
       </View>

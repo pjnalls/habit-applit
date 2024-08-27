@@ -18,6 +18,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function TabOneScreen() {
   const { colorScheme } = useColorScheme();
   const [tracks, setTracks] = useState<Track[]>([]);
+  const [currentDate, setCurrentDate] = useState(
+    new Date().toLocaleString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }),
+  );
   const { appData, setAppData } = useContext(AppDataContext);
 
   const handleOnValueChange = async (value: boolean, item: Track) => {
@@ -58,8 +66,7 @@ export default function TabOneScreen() {
     });
   };
 
-  const TrackItem = (data: ListRenderItemInfo<Track>) => {
-    const { item } = data;
+  const TrackItem = ({ item }: { item: Track }) => {
     const track = tracks.find(t => t.id === item.id);
     return (
       <View
@@ -82,8 +89,18 @@ export default function TabOneScreen() {
   useEffect(() => {
     if (appData) {
       setTracks(appData.tracks);
+      setCurrentDate(
+        new Date().toLocaleString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }),
+      );
+    } else {
+      setTracks([]);
     }
-  }, [appData]);
+  }, [appData?.tracks[0]]);
 
   return (
     <View
@@ -105,12 +122,7 @@ export default function TabOneScreen() {
           backgroundColor: 'transparent',
         }}>
         <Text style={{ fontSize: 20, marginBottom: 16, textAlign: 'center' }}>
-          {appData?.currentDate.toLocaleString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })}
+          {currentDate}
         </Text>
         <ScrollView
           style={{
@@ -119,13 +131,15 @@ export default function TabOneScreen() {
           }}>
           <FlatList
             data={tracks}
-            renderItem={data => <TrackItem {...data} />}
+            keyExtractor={item => `${item.id}`}
+            renderItem={data => <TrackItem item={data.item} />}
           />
         </ScrollView>
         <View
           style={{
             alignItems: 'center',
             backgroundColor: 'transparent',
+            marginBottom: 8,
           }}>
           {tracks.length <= 0 ? (
             <Text>Add a habit first to track it.</Text>
@@ -133,8 +147,8 @@ export default function TabOneScreen() {
             <Text></Text>
           )}
         </View>
-        {/* <TouchableOpacity
-          style={{ backgroundColor: Colors[colorScheme ?? 'light'].tint }}
+        <TouchableOpacity
+          style={{ alignItems: 'center' }}
           onPress={async () => {
             await AsyncStorage.clear();
             const data = await AsyncStorage.getItem(STORAGE_KEY);
@@ -146,14 +160,30 @@ export default function TabOneScreen() {
             await AsyncStorage.setItem(
               STORAGE_KEY,
               JSON.stringify({
-                habits: json.habits,
+                habits: [],
                 tracks: [],
+                currentDate: new Date(),
               }),
             );
             setAppData(json);
+            setTracks([]);
           }}>
-          <Text>Clear App Data</Text>
-        </TouchableOpacity> */}
+          <View
+            style={{
+              backgroundColor: Colors[colorScheme ?? 'light'].tint,
+              width: 120,
+              borderRadius: 4,
+              paddingVertical: 8,
+            }}>
+            <Text
+              style={{
+                color: Colors[colorScheme ?? 'light'].card,
+                textAlign: 'center',
+              }}>
+              Clear App Data
+            </Text>
+          </View>
+        </TouchableOpacity>
       </View>
     </View>
   );
