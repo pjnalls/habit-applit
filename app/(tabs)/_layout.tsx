@@ -59,7 +59,6 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name='index'
-        initialParams={{ showAddHabitModal: true }}
         options={{
           title: '',
           headerTitle: 'Create',

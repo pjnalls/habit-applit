@@ -1,13 +1,18 @@
-import { useContext, useState } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { useContext, useRef, useState } from 'react';
+import {
+  StyleSheet,
+  TextInput,
+  TextInputProps,
+  TouchableOpacity,
+} from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useColorScheme } from 'nativewind';
 
 import { Text, View } from '@/components/Themed';
 import Colors, { STORAGE_KEY } from '@/constants/Colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AppDataJson } from '../types';
-import { AppDataContext } from '../_layout';
+import { AppDataJson, Habit } from '@/app/types';
+import { AppDataContext } from '@/app/_layout';
 
 export default function TabOneScreen() {
   const { colorScheme } = useColorScheme();
@@ -22,6 +27,9 @@ export default function TabOneScreen() {
     const alphaNumericRegex = /^[A-Za-z0-9 ]+$/;
     return alphaNumericRegex.test(name);
   };
+  const nameRef = useRef<TextInput>(null);
+  const descRef = useRef<TextInput>(null);
+
   const handleOnChangeText = (
     text: string,
     setText: React.Dispatch<React.SetStateAction<string>>,
@@ -40,22 +48,24 @@ export default function TabOneScreen() {
       let json: AppDataJson;
 
       if (appData === null) {
-        json = { habits: [], tracks: [] };
+        json = { habits: [], tracks: [], currentDate: new Date() };
       } else {
         json = JSON.parse(appData);
       }
 
-      const habit = {
+      const habit: Habit = {
         id: json.habits.length,
         name: habitName,
         description: habitDesc,
-        frequency: 0,
+        currectFrequency: 0,
+        previousFrequency: 0,
+        completed: false,
       };
       json?.habits.push(habit);
       json?.tracks.push({
         id: json.tracks.length,
-        date: new Date().toLocaleString(),
-        habit: { id: habit.id, name: habit.name, completed: false },
+        date: new Date(),
+        habit,
       });
 
       setAppData(json);
@@ -63,10 +73,12 @@ export default function TabOneScreen() {
 
       setHabitName('');
       setHabitDesc('');
+      (nameRef.current as TextInputProps).value = '';
+      (descRef.current as TextInputProps).value = '';
       setIsSuccess(true);
       setTimeout(() => {
         setIsSuccess(false);
-      }, 5000);
+      }, 3000);
     } catch (error) {
       console.error('Error saving data.');
     }
@@ -102,6 +114,7 @@ export default function TabOneScreen() {
         <View style={styles.innerInputContainer}>
           <Text>Name</Text>
           <TextInput
+            ref={nameRef}
             style={[
               styles.textInput,
               {
@@ -125,6 +138,7 @@ export default function TabOneScreen() {
         <View style={styles.innerInputContainer}>
           <Text>Description</Text>
           <TextInput
+            ref={descRef}
             style={[
               styles.textInput,
               {

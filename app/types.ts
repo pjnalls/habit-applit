@@ -1,26 +1,22 @@
 export type AppDataJson = {
   habits: Habit[];
   tracks: Track[];
+  currentDate: Date;
 };
 
-type Habit = {
+export type Habit = {
   id: HabitId;
-  name?: string;
-  description?: string;
-  frequency?: number;
-  completed?: boolean;
+  name: string;
+  description: string;
+  currectFrequency: number;
+  previousFrequency: number;
+  completed: boolean;
 };
 
 type HabitId = number;
 
-type HabitTrack = {
-  id: HabitId;
-  completed: boolean;
-  name: string;
-};
-
 export type Track = {
   id: number;
-  date: string;
-  habit: HabitTrack;
+  date: Date;
+  habit: Habit;
 };

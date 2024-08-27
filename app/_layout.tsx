@@ -59,6 +59,7 @@ export const AppDataContext = createContext<{
   appData: {
     habits: [],
     tracks: [],
+    currentDate: new Date(),
   },
   setAppData: () => {},
 });
@@ -68,6 +69,7 @@ function RootLayoutNav() {
   const [appData, setAppData] = useState<AppDataJson | null>({
     habits: [],
     tracks: [],
+    currentDate: new Date(),
   });
 
   useEffect(() => {
@@ -76,7 +78,29 @@ function RootLayoutNav() {
       if (data === null) {
         return null;
       }
-      setAppData(JSON.parse(data));
+      const json: AppDataJson = JSON.parse(data);
+      json.currentDate = new Date(json.currentDate);
+
+      if (!json.currentDate) {
+        json.currentDate = new Date();
+      } else if (
+        json.currentDate.getFullYear() - new Date().getFullYear() !== 0 &&
+        json.currentDate.getMonth() - new Date().getMonth() !== 0 &&
+        json.currentDate.getDate() - new Date().getDate() !== 0
+      ) {
+        json.currentDate = new Date();
+        json.tracks.map(track => {
+          if (track.habit.currectFrequency <= track.habit.previousFrequency) {
+            track.habit.currectFrequency = track.habit.previousFrequency = 0;
+          } else {
+            track.habit.previousFrequency = track.habit.currectFrequency;
+          }
+          return { ...track, habit: { ...track.habit, completed: false } };
+        });
+      }
+
+      setAppData(json);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(json));
     };
 
     getInitAppData();

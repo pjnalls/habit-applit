@@ -1,12 +1,33 @@
 import { useColorScheme } from 'nativewind';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, ScrollView } from 'react-native';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 import Colors from '@/constants/Colors';
+import { useContext, useEffect } from 'react';
+import { AppDataContext } from '@/app/_layout';
+import { BarChart } from 'react-native-gifted-charts';
 
 export default function TabTwoScreen() {
   const { colorScheme } = useColorScheme();
+  const { appData } = useContext(AppDataContext);
+
+  let barData: { value: number; label: string }[] = appData
+    ? appData.tracks.map(track => ({
+        value: track.habit.currectFrequency,
+        label: track.habit.name,
+      }))
+    : [];
+
+  useEffect(() => {
+    if (appData && appData.tracks[0]) {
+      console.log(appData.tracks[0].habit.currectFrequency);
+      barData = appData.tracks.map(track => ({
+        value: track.habit.currectFrequency,
+        label: track.habit.name,
+      }));
+    }
+  }, [appData]);
+
   return (
     <View
       style={[
@@ -19,7 +40,33 @@ export default function TabTwoScreen() {
         lightColor='#eee'
         darkColor='rgba(255,255,255,0.1)'
       />
-      <EditScreenInfo path='app/(tabs)/two.tsx' />
+      <View
+        style={{
+          height: '80%',
+          width: '90%',
+          alignItems: 'center',
+          maxWidth: 768,
+          backgroundColor: 'transparent',
+        }}>
+        <ScrollView>
+          <BarChart
+            barWidth={16}
+            noOfSections={3}
+            barBorderRadius={4}
+            frontColor={Colors[colorScheme ?? 'light'].tint}
+            data={barData}
+            color={Colors[colorScheme ?? 'light'].tint}
+            width={360}
+            height={96 * (barData.length + 1)}
+            xAxisLabelsHeight={120}
+            spacing={180}
+            adjustToWidth={true}
+            yAxisThickness={0}
+            xAxisThickness={0}
+            horizontal={true}
+          />
+        </ScrollView>
+      </View>
     </View>
   );
 }

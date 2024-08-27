@@ -4,6 +4,7 @@ import {
   ListRenderItemInfo,
   ScrollView,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
 import Checkbox from 'expo-checkbox';
 import { useColorScheme } from 'nativewind';
@@ -17,7 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function TabOneScreen() {
   const { colorScheme } = useColorScheme();
   const [tracks, setTracks] = useState<Track[]>([]);
-  const { appData } = useContext(AppDataContext);
+  const { appData, setAppData } = useContext(AppDataContext);
 
   const handleOnValueChange = async (value: boolean, item: Track) => {
     const updatedTracks = tracks.map(track =>
@@ -27,6 +28,9 @@ export default function TabOneScreen() {
             habit: {
               ...track.habit,
               completed: value,
+              currectFrequency: value
+                ? track.habit.currectFrequency + 1
+                : track.habit.currectFrequency - 1,
             },
           } as Track)
         : (track as Track),
@@ -35,15 +39,23 @@ export default function TabOneScreen() {
 
     const data = await AsyncStorage.getItem(STORAGE_KEY);
     if (data === null) {
+      setAppData(null);
       return null;
     }
+    const json = JSON.parse(data) as AppDataJson;
     await AsyncStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({
-        habits: (JSON.parse(data) as AppDataJson).habits,
+        ...json,
+        habits: json.habits,
         tracks: updatedTracks,
       }),
     );
+    setAppData({
+      ...json,
+      habits: json.habits,
+      tracks: updatedTracks,
+    });
   };
 
   const TrackItem = (data: ListRenderItemInfo<Track>) => {
@@ -62,8 +74,7 @@ export default function TabOneScreen() {
           accessibilityLabel='Completed'>
           Completed
         </Checkbox>
-        <Text style={{ width: '60%' }}>{item.habit.name}</Text>
-        <Text style={{ textAlign: 'right', width: '36%' }}>{item.date}</Text>
+        <Text style={{ width: '100%' }}>{item.habit.name}</Text>
       </View>
     );
   };
@@ -87,7 +98,20 @@ export default function TabOneScreen() {
         darkColor='rgba(255,255,255,0.1)'
       />
       <View
-        style={{ height: '80%', width: '80%', backgroundColor: 'transparent' }}>
+        style={{
+          height: '80%',
+          width: '90%',
+          maxWidth: 768,
+          backgroundColor: 'transparent',
+        }}>
+        <Text style={{ fontSize: 20, marginBottom: 16, textAlign: 'center' }}>
+          {appData?.currentDate.toLocaleString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })}
+        </Text>
         <ScrollView
           style={{
             height: 60,
@@ -98,6 +122,38 @@ export default function TabOneScreen() {
             renderItem={data => <TrackItem {...data} />}
           />
         </ScrollView>
+        <View
+          style={{
+            alignItems: 'center',
+            backgroundColor: 'transparent',
+          }}>
+          {tracks.length <= 0 ? (
+            <Text>Add a habit first to track it.</Text>
+          ) : (
+            <Text></Text>
+          )}
+        </View>
+        {/* <TouchableOpacity
+          style={{ backgroundColor: Colors[colorScheme ?? 'light'].tint }}
+          onPress={async () => {
+            await AsyncStorage.clear();
+            const data = await AsyncStorage.getItem(STORAGE_KEY);
+            if (data === null) {
+              setAppData(null);
+              return null;
+            }
+            const json = JSON.parse(data) as AppDataJson;
+            await AsyncStorage.setItem(
+              STORAGE_KEY,
+              JSON.stringify({
+                habits: json.habits,
+                tracks: [],
+              }),
+            );
+            setAppData(json);
+          }}>
+          <Text>Clear App Data</Text>
+        </TouchableOpacity> */}
       </View>
     </View>
   );
