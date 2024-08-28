@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   TextInput,
@@ -7,12 +7,15 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useColorScheme } from 'nativewind';
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Text, View } from '@/components/Themed';
 import Colors, { STORAGE_KEY } from '@/constants/Colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AppDataJson, Habit } from '@/app/types';
+import { AppDataJson, Habit, Track } from '@/app/types';
 import { AppDataContext } from '@/app/_layout';
+import { router } from 'expo-router';
 
 export default function TabOneScreen() {
   const { colorScheme } = useColorScheme();
@@ -21,7 +24,8 @@ export default function TabOneScreen() {
   const [nameError, setNameError] = useState<string | null>(null);
   const [descError, setDescError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
-  const { setAppData } = useContext(AppDataContext);
+  const { appData, setAppData, isEditing, setIsEditing, editHabitId } =
+    useContext(AppDataContext);
 
   const validateText = (name: string) => {
     const regex = /^[a-zA-Z0-9\s.,!?-]+$/;
@@ -53,20 +57,36 @@ export default function TabOneScreen() {
         json = JSON.parse(appData);
       }
 
-      const habit: Habit = {
-        id: json.habits.length,
-        name: habitName,
-        description: habitDesc,
-        currectFrequency: 0,
-        previousFrequency: 0,
-        completed: false,
-      };
-      json?.habits.push(habit);
-      json?.tracks.push({
-        id: json.tracks.length,
-        date: new Date(),
-        habit,
-      });
+      if (isEditing) {
+        const tracks = json.tracks.map(t => {
+          if (t.id === editHabitId) {
+            return {
+              ...t,
+              habit: { ...t.habit, name: habitName, description: habitDesc },
+            };
+          } else {
+            return { ...t };
+          }
+        }) as Track[];
+        json.habits = tracks.map(t => t.habit);
+        json.tracks = tracks;
+      } else {
+        const id = uuidv4();
+        const habit: Habit = {
+          id,
+          name: habitName,
+          description: habitDesc,
+          currectFrequency: 0,
+          previousFrequency: 0,
+          completed: false,
+        };
+        json?.habits.push(habit);
+        json?.tracks.push({
+          id,
+          date: new Date(),
+          habit,
+        });
+      }
 
       setAppData(json);
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(json));
@@ -76,13 +96,31 @@ export default function TabOneScreen() {
       (nameRef.current as TextInputProps).value = '';
       (descRef.current as TextInputProps).value = '';
       setIsSuccess(true);
+      if (isEditing) {
+        setIsEditing(false);
+        router.navigate('/(tabs)/track');
+      }
       setTimeout(() => {
         setIsSuccess(false);
       }, 3000);
     } catch (error) {
-      console.error('Error saving data.');
+      console.error('Error saving data: ', error);
     }
   };
+
+  useEffect(() => {
+    if (isEditing) {
+      const habit = appData?.tracks.find(track => track.id == editHabitId)
+        ?.habit as Habit;
+      setHabitName(habit.name);
+      setHabitDesc(habit.description);
+      (nameRef.current as TextInputProps).value = habit.name;
+      (descRef.current as TextInputProps).value = habit.description;
+    } else {
+      setHabitName('');
+      setHabitDesc('');
+    }
+  }, [isEditing]);
 
   return (
     <View
@@ -90,7 +128,7 @@ export default function TabOneScreen() {
         styles.container,
         { backgroundColor: Colors[colorScheme ?? 'light'].card },
       ]}>
-      <Text style={styles.title}>Add Habit</Text>
+      <Text style={styles.title}>{isEditing ? 'Edit' : 'Add'} Habit</Text>
       <View
         style={styles.separator}
         lightColor='#eee'
@@ -216,7 +254,7 @@ const styles = StyleSheet.create({
   textInputError: {
     color: '#f00',
     textAlign: 'center',
-    height: 12,
+    height: 16,
   },
   submitButton: {
     marginLeft: 8,
@@ -230,7 +268,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: 'transparent',
     gap: 4,
-    height: 12,
+    height: 16,
   },
   title: {
     fontSize: 20,

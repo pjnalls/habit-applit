@@ -13,7 +13,7 @@ export type Habit = {
   completed: boolean;
 };
 
-type HabitId = number;
+export type HabitId = number | string;
 
 export type Track = {
   id: number;

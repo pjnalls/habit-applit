@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Appearance, Platform, Pressable } from 'react-native';
 
 import Colors from '@/constants/Colors';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import { useColorScheme } from 'nativewind';
+import { AppDataContext } from '../_layout';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -24,7 +25,7 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const { colorScheme, toggleColorScheme } = useColorScheme();
-
+  const { isEditing } = useContext(AppDataContext);
   return (
     <Tabs
       screenOptions={{
@@ -44,7 +45,14 @@ export default function TabLayout() {
             />
           ),
           headerRight: () => (
-            <Pressable onPress={toggleColorScheme}>
+            <Pressable
+              onPress={() => {
+                Platform.OS === 'web'
+                  ? toggleColorScheme()
+                  : Appearance.setColorScheme(
+                      colorScheme === 'dark' ? 'light' : 'dark',
+                    );
+              }}>
               {({ pressed }) => (
                 <FontAwesome
                   name={colorScheme === 'dark' ? 'sun-o' : 'moon-o'}
@@ -61,7 +69,7 @@ export default function TabLayout() {
         name='index'
         options={{
           title: '',
-          headerTitle: 'Create',
+          headerTitle: isEditing ? 'Edit' : 'Create',
           tabBarIcon: ({ color }) => (
             <TabBarIcon
               size={40}
@@ -70,7 +78,14 @@ export default function TabLayout() {
             />
           ),
           headerRight: () => (
-            <Pressable onPress={toggleColorScheme}>
+            <Pressable
+              onPress={() => {
+                Platform.OS === 'web'
+                  ? toggleColorScheme()
+                  : Appearance.setColorScheme(
+                      colorScheme === 'dark' ? 'light' : 'dark',
+                    );
+              }}>
               {({ pressed }) => (
                 <FontAwesome
                   name={colorScheme === 'dark' ? 'sun-o' : 'moon-o'}
@@ -94,7 +109,14 @@ export default function TabLayout() {
             />
           ),
           headerRight: () => (
-            <Pressable onPress={toggleColorScheme}>
+            <Pressable
+              onPress={() => {
+                Platform.OS === 'web'
+                  ? toggleColorScheme()
+                  : Appearance.setColorScheme(
+                      colorScheme === 'dark' ? 'light' : 'dark',
+                    );
+              }}>
               {({ pressed }) => (
                 <FontAwesome
                   name={colorScheme === 'dark' ? 'sun-o' : 'moon-o'}

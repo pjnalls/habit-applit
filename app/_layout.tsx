@@ -11,7 +11,7 @@ import { createContext, useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from 'nativewind';
-import { AppDataJson } from './types';
+import { AppDataJson, Habit, HabitId } from './types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEY } from '@/constants/Colors';
 
@@ -55,6 +55,10 @@ export default function RootLayout() {
 export const AppDataContext = createContext<{
   appData: AppDataJson | null;
   setAppData: React.Dispatch<React.SetStateAction<AppDataJson | null>>;
+  isEditing: boolean;
+  setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
+  editHabitId: HabitId;
+  setEditHabitId: React.Dispatch<React.SetStateAction<HabitId>>;
 }>({
   appData: {
     habits: [],
@@ -62,6 +66,10 @@ export const AppDataContext = createContext<{
     currentDate: new Date(),
   },
   setAppData: () => {},
+  isEditing: false,
+  setIsEditing: () => {},
+  editHabitId: 0,
+  setEditHabitId: () => {},
 });
 
 function RootLayoutNav() {
@@ -71,6 +79,8 @@ function RootLayoutNav() {
     tracks: [],
     currentDate: new Date(),
   });
+  const [isEditing, setIsEditing] = useState(false);
+  const [editHabitId, setEditHabitId] = useState<HabitId>(0);
 
   useEffect(() => {
     const getInitAppData = async () => {
@@ -108,7 +118,15 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AppDataContext.Provider value={{ appData, setAppData }}>
+      <AppDataContext.Provider
+        value={{
+          appData,
+          setAppData,
+          isEditing,
+          setIsEditing,
+          editHabitId,
+          setEditHabitId,
+        }}>
         <Stack>
           <Stack.Screen
             name='(tabs)'

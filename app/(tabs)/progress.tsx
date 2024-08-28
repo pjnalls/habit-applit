@@ -1,5 +1,5 @@
 import { useColorScheme } from 'nativewind';
-import { StyleSheet, ScrollView } from 'react-native';
+import { StyleSheet, ScrollView, Dimensions } from 'react-native';
 
 import { Text, View } from '@/components/Themed';
 import Colors from '@/constants/Colors';
@@ -20,7 +20,6 @@ export default function TabTwoScreen() {
 
   useEffect(() => {
     if (appData && appData.tracks[0]) {
-      console.log(appData.tracks[0].habit.currectFrequency);
       barData = appData.tracks.map(track => ({
         value: track.habit.currectFrequency,
         label: track.habit.name,
@@ -34,7 +33,7 @@ export default function TabTwoScreen() {
         styles.container,
         { backgroundColor: Colors[colorScheme ?? 'light'].card },
       ]}>
-      <Text style={styles.title}>Visualize Progress</Text>
+      <Text style={styles.title}>Completed Streaks</Text>
       <View
         style={styles.separator}
         lightColor='#eee'
@@ -43,14 +42,13 @@ export default function TabTwoScreen() {
       <View
         style={{
           height: '80%',
-          width: '90%',
-          alignItems: 'center',
+          width: '80%',
           maxWidth: 768,
           backgroundColor: 'transparent',
         }}>
         <ScrollView>
           <BarChart
-            barWidth={12}
+            barWidth={24}
             noOfSections={3}
             barBorderRadius={4}
             frontColor={Colors[colorScheme ?? 'light'].tint}
@@ -58,9 +56,16 @@ export default function TabTwoScreen() {
             color={Colors[colorScheme ?? 'light'].tint}
             width={360}
             height={96 * (barData.length + 1)}
-            xAxisLabelsHeight={64}
-            spacing={96}
-            adjustToWidth={true}
+            xAxisLabelsHeight={24}
+            spacing={48}
+            rulesColor={Colors[colorScheme ?? 'light'].placeholder}
+            yAxisTextStyle={{ color: Colors[colorScheme ?? 'light'].text }}
+            xAxisLabelTextStyle={{ color: Colors[colorScheme ?? 'light'].text }}
+            isThreeD={true}
+            sideColor={'#a6a'}
+            topColor={'#848'}
+            animationDuration={300}
+            rotateLabel={true}
             yAxisThickness={0}
             xAxisThickness={0}
             horizontal={true}

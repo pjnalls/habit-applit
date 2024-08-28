@@ -1,5 +1,4 @@
-const tintColorLight = '#2f95dc';
-const tintColorDark = '#fff';
+const tintColor = '#9c63ca';
 
 export default {
   light: {
@@ -9,9 +8,10 @@ export default {
     inputBackground: '#ddd',
     card: '#fff',
     success: '#090',
-    tint: tintColorLight,
+    failure: '#d00',
+    tint: tintColor,
     tabIconDefault: '#ccc',
-    tabIconSelected: tintColorLight,
+    tabIconSelected: tintColor,
   },
   dark: {
     text: '#fff',
@@ -20,9 +20,10 @@ export default {
     inputBackground: '#333',
     card: '#111',
     success: '#0f0',
-    tint: tintColorDark,
+    failure: '#f66',
+    tint: tintColor,
     tabIconDefault: '#ccc',
-    tabIconSelected: tintColorDark,
+    tabIconSelected: tintColor,
   },
 };
 
