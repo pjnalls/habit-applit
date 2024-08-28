@@ -11,7 +11,7 @@ import { createContext, useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from 'nativewind';
-import { AppDataJson, Habit, HabitId } from './types';
+import { AppDataJson, HabitId } from './types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEY } from '@/constants/Colors';
 
@@ -88,7 +88,7 @@ function RootLayoutNav() {
       if (data === null) {
         return null;
       }
-      const json: AppDataJson = JSON.parse(data);
+      let json: AppDataJson = JSON.parse(data);
       json.currentDate = new Date(json.currentDate);
 
       if (!json.currentDate) {
@@ -99,7 +99,7 @@ function RootLayoutNav() {
         json.currentDate.getDate() - new Date().getDate() !== 0
       ) {
         json.currentDate = new Date();
-        json.tracks.map(track => {
+        json.tracks = json.tracks.map(track => {
           if (track.habit.currectFrequency <= track.habit.previousFrequency) {
             track.habit.currectFrequency = track.habit.previousFrequency = 0;
           } else {
